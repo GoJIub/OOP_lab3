@@ -6,26 +6,30 @@
 class Pentagon : public Figure
 {
 public:
+    Pentagon();
 
-    Pentagon() = default;
     Pentagon(const Pentagon& other);
     Pentagon(Pentagon&& other) noexcept;
 
     Pentagon& operator=(const Pentagon& other);
     Pentagon& operator=(Pentagon&& other) noexcept;
 
+    virtual void Print(std::ostream& os) const override;
+    virtual void Read(std::istream& is) override;
+
     virtual Point center() const override;
     virtual double surface() const override;
-    // virtual bool validate() const override;
 
     virtual operator double() const override;
     virtual bool operator==(const Figure& other) const override;
+    
+    virtual bool validate() const override;
 
     ~Pentagon();
 
 private:
     Point* vertices{nullptr};
-    int n{0};
+    int n{5};
 };
 
 #endif

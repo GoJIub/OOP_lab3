@@ -1,6 +1,10 @@
 #include "Trapezoid.h"
 #include <cmath>
 
+Trapezoid::Trapezoid() {
+    vertices = new Point[n];
+}
+
 Trapezoid::Trapezoid(const Trapezoid& other) : n(other.n) {
     vertices = new Point[n];
     for (int i = 0; i < n; ++i) vertices[i] = other.vertices[i];
@@ -65,6 +69,13 @@ bool Trapezoid::operator==(const Figure& other) const {
             return false;
     }
     return true;
+}
+
+bool Trapezoid::validate() const {
+    if (std::abs(vertices[0].y - vertices[1].y) != std::abs(vertices[2].y - vertices[3].y)) return false; // Параллельность
+    double side1 = vertices[1].distanceTo(vertices[2]);
+    double side2 = vertices[0].distanceTo(vertices[3]);
+    return std::abs(side1 - side2) < 1e-6;
 }
 
 Trapezoid::~Trapezoid() {

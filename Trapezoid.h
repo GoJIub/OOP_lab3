@@ -6,26 +6,30 @@
 class Trapezoid : public Figure
 {
 public:
+    Trapezoid();
 
-    Trapezoid() = default;
     Trapezoid(const Trapezoid& other);
     Trapezoid(Trapezoid&& other) noexcept;
 
     Trapezoid& operator=(const Trapezoid& other);
     Trapezoid& operator=(Trapezoid&& other) noexcept;
 
+    virtual void Print(std::ostream& os) const override;
+    virtual void Read(std::istream& is) override;
+
     virtual Point center() const override;
     virtual double surface() const override;
-    // virtual bool validate() const override;
 
     virtual operator double() const override;
     virtual bool operator==(const Figure& other) const override;
+    
+    virtual bool validate() const override;
 
     ~Trapezoid();
 
 private:
     Point* vertices{nullptr};
-    int n{0};
+    int n{4};
 };
 
 #endif

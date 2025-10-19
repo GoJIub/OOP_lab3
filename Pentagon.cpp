@@ -70,6 +70,16 @@ bool Pentagon::operator==(const Figure& other) const {
     return true;
 }
 
+bool Pentagon::validate() const {
+    double side = vertices[0].distanceTo(vertices[1]);
+    for (int i = 0; i < n; ++i) {
+        int j = (i + 1) % n;
+        double currSide = vertices[i].distanceTo(vertices[j]);
+        if (std::abs(currSide - side) > 1e-6) return false;
+    }
+    return true;
+}
+
 Pentagon::~Pentagon() {
     delete[] vertices;
 }

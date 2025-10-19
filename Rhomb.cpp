@@ -66,6 +66,15 @@ bool Rhomb::operator==(const Figure& other) const {
     return true;
 }
 
+bool Rhomb::validate() const {
+    double side1 = vertices[0].distanceTo(vertices[1]);
+    double side2 = vertices[1].distanceTo(vertices[2]);
+    double side3 = vertices[2].distanceTo(vertices[3]);
+    double side4 = vertices[3].distanceTo(vertices[0]);
+    return std::abs(side1 - side2) < 1e-6 && std::abs(side2 - side3) < 1e-6 &&
+           std::abs(side3 - side4) < 1e-6;
+}
+
 Rhomb::~Rhomb() {
     delete[] vertices;
 }
