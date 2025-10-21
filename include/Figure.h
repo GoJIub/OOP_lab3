@@ -15,8 +15,8 @@ class Figure
 protected:
     Figure() = default;
 
-    virtual void Print(std::ostream& os) const = 0;
-    virtual void Read(std::istream& is) = 0;
+    virtual void print(std::ostream& os) const = 0;
+    virtual void read(std::istream& is) = 0;
     virtual bool validate() const = 0;
 
 public:
@@ -30,12 +30,12 @@ public:
 };
 
 inline std::ostream& operator<<(std::ostream& os, const Figure& fig) {
-    fig.Print(os);
+    fig.print(os);
     return os;
 }
 
 inline std::istream& operator>>(std::istream& is, Figure& fig) {
-    fig.Read(is);
+    fig.read(is);
     return is;
 }
 

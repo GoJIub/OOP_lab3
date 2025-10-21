@@ -1,5 +1,9 @@
-#include "Pentagon.h"
+#include "../include/Pentagon.h"
 #include <cmath>
+
+Pentagon::Pentagon() {
+    vertices = new Point[n];
+}
 
 Pentagon::Pentagon(const Pentagon& other) : n(other.n) {
     vertices = new Point[n];
@@ -37,6 +41,15 @@ Pentagon& Pentagon::operator=(Pentagon&& other) noexcept {
     return *this;
 }
 
+void Pentagon::print(std::ostream& os) const {
+    for (int i = 0; i < n; ++i) os << vertices[i] << " ";
+}
+
+void Pentagon::read(std::istream& is) {
+    std::cout << "Enter 5 pentagon vertices separated by spaces (in x y format):\n";
+    for (int i = 0; i < n; ++i) is >> vertices[i];
+}
+
 Point Pentagon::center() const {
     double cx{0.0}, cy {0.0};
     for (int i = 0; i < n; ++i) {
@@ -61,13 +74,8 @@ Pentagon::operator double() const {
 }
 
 bool Pentagon::operator==(const Figure& other) const {
-    const Pentagon* o = dynamic_cast<const Pentagon*>(&other);
-    if (!o) return false;
-    for (int i = 0; i < n; ++i) {
-        if (vertices[i].x != o->vertices[i].x || vertices[i].y != o->vertices[i].y)
-            return false;
-    }
-    return true;
+    if (typeid(*this) != typeid(other)) return false;
+    return *this == static_cast<const Pentagon&>(other);
 }
 
 bool Pentagon::validate() const {

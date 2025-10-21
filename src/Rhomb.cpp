@@ -1,5 +1,9 @@
-#include "Rhomb.h"
+#include "../include/Rhomb.h"
 #include <cmath>
+
+Rhomb::Rhomb() {
+    vertices = new Point[n];
+}
 
 Rhomb::Rhomb(const Rhomb& other) : n(other.n) {
     vertices = new Point[n];
@@ -37,6 +41,15 @@ Rhomb& Rhomb::operator=(Rhomb&& other) noexcept {
     return *this;
 }
 
+void Rhomb::print(std::ostream& os) const {
+    for (int i = 0; i < n; ++i) os << vertices[i] << " ";
+}
+
+void Rhomb::read(std::istream& is) {
+    std::cout << "Enter 4 rhomb vertices separated by spaces (in x y format):\n";
+    for (int i = 0; i < n; ++i) is >> vertices[i];
+}
+
 Point Rhomb::center() const {
     double cx{0.0}, cy {0.0};
     for (int i = 0; i < n; ++i) {
@@ -57,13 +70,8 @@ Rhomb::operator double() const {
 }
 
 bool Rhomb::operator==(const Figure& other) const {
-    const Rhomb* o = dynamic_cast<const Rhomb*>(&other);
-    if (!o) return false;
-    for (int i = 0; i < n; ++i) {
-        if (vertices[i].x != o->vertices[i].x || vertices[i].y != o->vertices[i].y)
-            return false;
-    }
-    return true;
+    if (typeid(*this) != typeid(other)) return false;
+    return *this == static_cast<const Rhomb&>(other);
 }
 
 bool Rhomb::validate() const {

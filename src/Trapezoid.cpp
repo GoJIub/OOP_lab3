@@ -1,4 +1,4 @@
-#include "Trapezoid.h"
+#include "../include/Trapezoid.h"
 #include <cmath>
 
 Trapezoid::Trapezoid() {
@@ -41,6 +41,15 @@ Trapezoid& Trapezoid::operator=(Trapezoid&& other) noexcept {
     return *this;
 }
 
+void Trapezoid::print(std::ostream& os) const {
+    for (int i = 0; i < n; ++i) os << vertices[i] << " ";
+}
+
+void Trapezoid::read(std::istream& is) {
+    std::cout << "Enter 4 trapezoid vertices separated by spaces (in x y format):\n";
+    for (int i = 0; i < n; ++i) is >> vertices[i];
+}
+
 Point Trapezoid::center() const {
     double cx{0.0}, cy {0.0};
     for (int i = 0; i < n; ++i) {
@@ -62,13 +71,8 @@ Trapezoid::operator double() const {
 }
 
 bool Trapezoid::operator==(const Figure& other) const {
-    const Trapezoid* o = dynamic_cast<const Trapezoid*>(&other);
-    if (!o) return false;
-    for (int i = 0; i < n; ++i) {
-        if (vertices[i].x != o->vertices[i].x || vertices[i].y != o->vertices[i].y)
-            return false;
-    }
-    return true;
+    if (typeid(*this) != typeid(other)) return false;
+    return *this == static_cast<const Trapezoid&>(other);
 }
 
 bool Trapezoid::validate() const {
