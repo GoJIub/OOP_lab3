@@ -55,7 +55,7 @@ int main() {
             std::cout << "Figure 0 is not equal to figure 1\n";
 
         std::cout << "surface of figure 0 = " 
-                  << static_cast<double>(figures[0]) << std::endl;
+                  << double(figures[0]) << std::endl;
 
         // 8. Проверка копирования и перемещения Trapezoid
         std::cout << "\n=== Copy and move semantics test (Trapezoid) ===\n";

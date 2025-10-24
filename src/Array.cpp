@@ -13,11 +13,8 @@ void Array::add(std::unique_ptr<Figure> fig) {
 
 void Array::remove(size_t index) {
     if (index >= size) throw std::out_of_range("Invalid index");
-
     data[index].reset();
-
     for (size_t i = index; i < size - 1; ++i) data[i] = std::move(data[i + 1]);
-
     data[--size].reset();
 }
 
@@ -35,7 +32,7 @@ void Array::printSurfaces() const {
     std::cout << std::fixed << std::setprecision(2);
     for (size_t i = 0; i < size; ++i) {
         std::cout << i << ": " << *data[i]
-                  << " | Area = " << static_cast<double>(*data[i]) << std::endl;
+                  << " | Surface = " << double(*data[i]) << std::endl;
     }
 }
 
@@ -48,9 +45,7 @@ void Array::printCenters() const {
 
 double Array::totalSurface() const {
     double total = 0;
-    for (size_t i = 0; i < size; ++i) {
-        total += static_cast<double>(*data[i]);
-    }
+    for (size_t i = 0; i < size; ++i) total += double(*data[i]);
     return total;
 }
 

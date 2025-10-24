@@ -27,6 +27,7 @@ public:
 
     virtual operator double() const = 0;
     virtual bool operator==(const Figure& other) const = 0;
+    virtual bool operator!=(const Figure& other) const = 0;
 };
 
 inline std::ostream& operator<<(std::ostream& os, const Figure& fig) {

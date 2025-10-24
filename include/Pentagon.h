@@ -21,9 +21,8 @@ public:
     virtual double surface() const override;
 
     virtual operator double() const override;
-    
-    bool operator==(const Pentagon& other) const = default;
     virtual bool operator==(const Figure& other) const override;
+    virtual bool operator!=(const Figure& other) const override;
     
     virtual bool validate() const override;
 

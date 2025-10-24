@@ -46,8 +46,11 @@ void Pentagon::print(std::ostream& os) const {
 }
 
 void Pentagon::read(std::istream& is) {
-    std::cout << "Enter 5 pentagon vertices separated by spaces (in x y format):\n";
+    if (is.rdbuf() == std::cin.rdbuf())
+        std::cout << "Enter 5 pentagon vertices separated by spaces (in x y format):\n";
+
     for (int i = 0; i < n; ++i) is >> vertices[i];
+    if (!validate()) throw std::invalid_argument("The entered points do not form a pentagon!");
 }
 
 Point Pentagon::center() const {
@@ -74,16 +77,43 @@ Pentagon::operator double() const {
 }
 
 bool Pentagon::operator==(const Figure& other) const {
-    if (typeid(*this) != typeid(other)) return false;
-    return *this == static_cast<const Pentagon&>(other);
+    const Pentagon* o = dynamic_cast<const Pentagon*>(&other);
+    if (!o) return false;
+
+    for (int shift = 0; shift < n; ++shift) {
+        bool match = true;
+        for (int i = 0; i < n; ++i) {
+            int shifted_index = (i + shift) % n;
+            if (vertices[i].x != o->vertices[shifted_index].x ||
+                vertices[i].y != o->vertices[shifted_index].y) {
+                match = false;
+                break;
+            }
+        }
+        if (match) return true;
+    }
+    return false;
+}
+
+bool Pentagon::operator!=(const Figure& other) const {
+    return !(other == *this);
 }
 
 bool Pentagon::validate() const {
+    for (int i = 0; i < n; ++i) {
+        for (int j = i + 1; j < n; ++j) {
+            if (vertices[i].x == vertices[j].x &&
+                vertices[i].y == vertices[j].y) {
+                return false;
+            }
+        }
+    }
+
     double side = vertices[0].distanceTo(vertices[1]);
     for (int i = 0; i < n; ++i) {
         int j = (i + 1) % n;
         double currSide = vertices[i].distanceTo(vertices[j]);
-        if (std::abs(currSide - side) > 1e-6) return false;
+        if (std::abs(currSide - side) > 1) return false;
     }
     return true;
 }

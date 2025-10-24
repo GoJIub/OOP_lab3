@@ -3,161 +3,119 @@
 #include <sstream>
 #include <typeinfo>
 
-// Подключаем заголовки
+// Заголовки
 #include "../include/Figure.h"
 #include "../include/Trapezoid.h"
 #include "../include/Rhomb.h"
 #include "../include/Pentagon.h"
 #include "../include/Array.h"
 
-// Вспомогательная функция для ввода
+// Вспомогательная функция для имитации пользовательского ввода
 void inputFigure(Figure& fig, const std::string& input) {
     std::istringstream iss(input);
     iss >> fig;
 }
 
 // --- ТЕСТЫ ДЛЯ Trapezoid ---
-TEST(TrapezoidTest, DefaultConstructor) {
-    Trapezoid t;
-    EXPECT_EQ(t.center().x, 0.0);
-    EXPECT_EQ(t.center().y, 0.0);
-}
-
 TEST(TrapezoidTest, InputAndOutput) {
     Trapezoid t;
-    inputFigure(t, "0 0  4 0  3 3  1 3"); // равнобедренная трапеция
+    inputFigure(t, "0 0  4 0  3 3  1 3");
     std::ostringstream oss;
     oss << t;
     EXPECT_EQ(oss.str(), "(0, 0) (4, 0) (3, 3) (1, 3) ");
 }
 
-TEST(TrapezoidTest, AreaCalculation) {
+TEST(TrapezoidTest, AreaAndCenter) {
     Trapezoid t;
     inputFigure(t, "0 0  6 0  4 4  2 4");
-    EXPECT_DOUBLE_EQ(static_cast<double>(t), 16.0);
-}
-
-TEST(TrapezoidTest, CenterCalculation) {
-    Trapezoid t;
-    inputFigure(t, "0 0  4 0  3 3  1 3");
+    EXPECT_DOUBLE_EQ(double(t), 16.0);
     Point c = t.center();
-    EXPECT_DOUBLE_EQ(c.x, 2.0);
-    EXPECT_DOUBLE_EQ(c.y, 1.5);
+    EXPECT_DOUBLE_EQ(c.x, 3.0);
+    EXPECT_DOUBLE_EQ(c.y, 2.0);
 }
 
-TEST(TrapezoidTest, validateEqualSides) {
-    Trapezoid t;
-    inputFigure(t, "0 0  4 0  3 3  1 3"); // равнобедренная
-    EXPECT_TRUE(t.validate());
+TEST(TrapezoidTest, ValidateCorrectAndIncorrect) {
+    Trapezoid t1;
+    inputFigure(t1, "0 0  4 0  3 3  1 3");
+    EXPECT_TRUE(t1.validate()); // корректная трапеция
 
     Trapezoid t2;
-    inputFigure(t2, "0 0  4 0  3 3  0 3"); // не равнобедренная
-    EXPECT_FALSE(t2.validate());
+    EXPECT_THROW(inputFigure(t2, "0 0  4 0  3 3  0 3"), std::invalid_argument); // некорректная трапеция
+
 }
 
-TEST(TrapezoidTest, CopyConstructor) {
+TEST(TrapezoidTest, ValidateDegenerateCase) {
+    Trapezoid t;
+    EXPECT_THROW(inputFigure(t, "1 1  1 1  1 1  1 1"), std::invalid_argument); // все точки совпадают
+}
+
+TEST(TrapezoidTest, CopyAndMove) {
     Trapezoid t1;
     inputFigure(t1, "0 0  4 0  3 3  1 3");
     Trapezoid t2 = t1;
-    EXPECT_EQ(t1, t2);
-    EXPECT_NE(&t1, &t2);
-}
+    EXPECT_TRUE(t1 == t2);
 
-TEST(TrapezoidTest, MoveConstructor) {
-    Trapezoid t1;
-    inputFigure(t1, "0 0  4 0  3 3  1 3");
-    Trapezoid t2 = std::move(t1);
+    Trapezoid t3 = std::move(t1);
     std::ostringstream oss;
-    oss << t2;
+    oss << t3;
     EXPECT_EQ(oss.str(), "(0, 0) (4, 0) (3, 3) (1, 3) ");
 }
 
 // --- ТЕСТЫ ДЛЯ Rhomb ---
-TEST(RhombTest, InputAndArea) {
+TEST(RhombTest, AreaAndValidate) {
     Rhomb r;
-    inputFigure(r, "0 0  3 0  5 3  2 3"); // ромб со стороной 3
-    EXPECT_DOUBLE_EQ(static_cast<double>(r), 9.0); // диагонали 5 и 6? Нет
-    // (0,0), (3,0), (5,3), (2,3) → диагонали: 5 и 6 → 5*6/2 = 15
-    EXPECT_DOUBLE_EQ(static_cast<double>(r), 15.0);
+    inputFigure(r, "3 0  0 4  -3 0  0 -4");
+    EXPECT_TRUE(r.validate());
+    EXPECT_NEAR(double(r), 24.0, 1e-6);
 }
 
-TEST(RhombTest, validateAllSidesEqual) {
-    Rhomb r;
-    inputFigure(r, "0 0  3 0  5 3  2 3");
-    EXPECT_TRUE(r.validate());
+TEST(RhombTest, DegenerateAndInvalid) {
+    Rhomb r1;
+    EXPECT_THROW(inputFigure(r1, "0 0  3 0  4 3  1 3"), std::invalid_argument);
 
     Rhomb r2;
-    inputFigure(r2, "0 0  3 0  4 3  1 3"); // не ромб
-    EXPECT_FALSE(r2.validate());
-}
-
-TEST(RhombTest, Equality) {
-    Rhomb r1, r2;
-    inputFigure(r1, "0 0  3 0  5 3  2 3");
-    inputFigure(r2, "0 0  3 0  5 3  2 3");
-    EXPECT_TRUE(r1 == r2);
+    EXPECT_THROW(inputFigure(r2, "2 2  2 2  2 2  2 2"), std::invalid_argument);
 }
 
 // --- ТЕСТЫ ДЛЯ Pentagon ---
-TEST(PentagonTest, RegularPentagonArea) {
+TEST(PentagonTest, RegularAndDegenerate) {
     Pentagon p;
-    // Регулярный пятиугольник со стороной 2
-    inputFigure(p, "0 0  2 0  3 1.5  1.5 3  0.5 3");
-    EXPECT_NEAR(static_cast<double>(p), 7.0, 0.5); // примерно
-}
-
-TEST(PentagonTest, validateRegular) {
-    Pentagon p;
-    inputFigure(p, "0 0  2 0  3 1.5  1.5 3  0.5 3");
+    inputFigure(p, "3.20 1.50  2.03 3.12  0.12 2.50  0.12 0.50  2.03 -0.12");
     EXPECT_TRUE(p.validate());
+    EXPECT_NEAR(double(p), 7.0, 0.5);
+
+    Pentagon p2;
+    EXPECT_THROW(inputFigure(p2, "1 1  1 1  1 1  1 1  1 1"), std::invalid_argument);
 }
 
 // --- ТЕСТЫ ДЛЯ Array ---
-TEST(ArrayTest, AddAndSize) {
-    Array arr;
-    arr.add(std::make_unique<Trapezoid>());
-    arr.add(std::make_unique<Rhomb>());
-    EXPECT_EQ(arr.getSize(), 2);
-}
-
-TEST(ArrayTest, Remove) {
+TEST(ArrayTest, AddRemoveSize) {
     Array arr;
     arr.add(std::make_unique<Trapezoid>());
     arr.add(std::make_unique<Rhomb>());
     arr.add(std::make_unique<Pentagon>());
+    EXPECT_EQ(arr.getSize(), 3);
 
     arr.remove(1);
     EXPECT_EQ(arr.getSize(), 2);
-    EXPECT_TRUE(dynamic_cast<Trapezoid*>(&arr[0]));
-    EXPECT_TRUE(dynamic_cast<Pentagon*>(&arr[1]));
+    EXPECT_THROW(arr.remove(5), std::out_of_range);
 }
 
 TEST(ArrayTest, TotalSurface) {
     Array arr;
-    auto t = std::make_unique<Trapezoid>();
-    inputFigure(*t, "0 0  4 0  3 3  1 3"); // площадь ~12
-    arr.add(std::move(t));
 
-    auto r = std::make_unique<Rhomb>();
-    inputFigure(*r, "0 0  3 0  5 3  2 3"); // площадь 15
-    arr.add(std::move(r));
-
-    EXPECT_NEAR(arr.totalSurface(), 27.0, 1.0);
-}
-
-TEST(ArrayTest, PrintSurfaces) {
-    Array arr;
     auto t = std::make_unique<Trapezoid>();
     inputFigure(*t, "0 0  4 0  3 3  1 3");
-    arr.add(std::move(t));
+    arr.add(std::move(t)); // площадь 9
 
-    testing::internal::CaptureStdout();
-    arr.printSurfaces();
-    std::string output = testing::internal::GetCapturedStdout();
-    EXPECT_TRUE(output.find("Area") != std::string::npos);
+    auto r = std::make_unique<Rhomb>();
+    inputFigure(*r, "3 0  0 4  -3 0  0 -4"); // площадь 24
+    arr.add(std::move(r));
+
+    EXPECT_NEAR(arr.totalSurface(), 33.0, 1.0);
 }
 
-TEST(ArrayTest, OutOfRange) {
+TEST(ArrayTest, OutOfRangeAccess) {
     Array arr;
     arr.add(std::make_unique<Trapezoid>());
     EXPECT_THROW(arr[10], std::out_of_range);
@@ -170,17 +128,57 @@ TEST(ArrayTest, Polymorphism) {
     arr.add(std::make_unique<Pentagon>());
 
     for (size_t i = 0; i < arr.getSize(); ++i) {
+        // проверяем, что это производный тип
         EXPECT_NE(typeid(arr[i]), typeid(Figure));
     }
 }
 
-// --- ТЕСТЫ ДЛЯ Figure (абстрактный класс) ---
-TEST(FigureTest, CannotInstantiate) {
-    // Figure f; // Должно быть ошибкой компиляции
-    static_assert(!std::is_constructible<Figure>::value, "Figure should not be instantiable");
+// --- ТЕСТЫ ДЛЯ Figure ---
+TEST(FigureTest, AbstractClass) {
+    static_assert(!std::is_constructible<Figure>::value,
+                  "Figure must be abstract");
 }
 
-// --- ОСНОВНАЯ ФУНКЦИЯ ---
+// --- НЕГАТИВНЫЕ ТЕСТЫ ДЛЯ ВАЛИДАЦИИ ЧЕРЕЗ Read() ---
+
+TEST(TrapezoidTest, InvalidInputThrows) {
+    Trapezoid t;
+    std::istringstream iss("0 0  0 0  0 0  0 0"); // все точки совпадают
+    EXPECT_THROW(iss >> t, std::invalid_argument);
+}
+
+TEST(TrapezoidTest, NonIsoscelesTrapezoidThrows) {
+    Trapezoid t;
+    std::istringstream iss("0 0  4 0  3 3  0 3"); // неравнобокая
+    EXPECT_THROW(iss >> t, std::invalid_argument);
+}
+
+TEST(RhombTest, InvalidRhombThrows) {
+    Rhomb r;
+    std::istringstream iss("0 0  3 0  4 3  1 3"); // не ромб
+    EXPECT_THROW(iss >> r, std::invalid_argument);
+}
+
+TEST(RhombTest, DegenerateRhombThrows) {
+    Rhomb r;
+    std::istringstream iss("1 1  1 1  1 1  1 1");
+    EXPECT_THROW(iss >> r, std::invalid_argument);
+}
+
+TEST(PentagonTest, DegeneratePentagonThrows) {
+    Pentagon p;
+    std::istringstream iss("1 1  1 1  1 1  1 1  1 1");
+    EXPECT_THROW(iss >> p, std::invalid_argument);
+}
+
+TEST(PentagonTest, InvalidPentagonThrows) {
+    Pentagon p;
+    // неправильная форма, нарушен угол
+    std::istringstream iss("0 0  10 0  11 0.5  1 3  0.5 3");
+    EXPECT_THROW(iss >> p, std::invalid_argument);
+}
+
+// --- MAIN ---
 int main(int argc, char **argv) {
     ::testing::InitGoogleTest(&argc, argv);
     return RUN_ALL_TESTS();

@@ -46,8 +46,11 @@ void Rhomb::print(std::ostream& os) const {
 }
 
 void Rhomb::read(std::istream& is) {
-    std::cout << "Enter 4 rhomb vertices separated by spaces (in x y format):\n";
+    if (is.rdbuf() == std::cin.rdbuf())
+        std::cout << "Enter 4 rhomb vertices separated by spaces (in x y format):\n";
+    
     for (int i = 0; i < n; ++i) is >> vertices[i];
+    if (!validate()) throw std::invalid_argument("The entered points do not form a rhomb!");
 }
 
 Point Rhomb::center() const {
@@ -60,8 +63,8 @@ Point Rhomb::center() const {
 }
 
 double Rhomb::surface() const {
-    double d1 = vertices[0].distanceTo(vertices[1]);
-    double d2 = vertices[2].distanceTo(vertices[3]);
+    double d1 = vertices[0].distanceTo(vertices[2]);
+    double d2 = vertices[1].distanceTo(vertices[3]);
     return d1 * d2 / 2.0;
 }
 
@@ -70,11 +73,38 @@ Rhomb::operator double() const {
 }
 
 bool Rhomb::operator==(const Figure& other) const {
-    if (typeid(*this) != typeid(other)) return false;
-    return *this == static_cast<const Rhomb&>(other);
+    const Rhomb* o = dynamic_cast<const Rhomb*>(&other);
+    if (!o) return false;
+
+    for (int shift = 0; shift < n; ++shift) {
+        bool match = true;
+        for (int i = 0; i < n; ++i) {
+            int shifted_index = (i + shift) % n;
+            if (vertices[i].x != o->vertices[shifted_index].x ||
+                vertices[i].y != o->vertices[shifted_index].y) {
+                match = false;
+                break;
+            }
+        }
+        if (match) return true;
+    }
+    return false;
+}
+
+bool Rhomb::operator!=(const Figure& other) const {
+    return !(other == *this);
 }
 
 bool Rhomb::validate() const {
+    for (int i = 0; i < n; ++i) {
+        for (int j = i + 1; j < n; ++j) {
+            if (vertices[i].x == vertices[j].x &&
+                vertices[i].y == vertices[j].y) {
+                return false;
+            }
+        }
+    }
+    
     double side1 = vertices[0].distanceTo(vertices[1]);
     double side2 = vertices[1].distanceTo(vertices[2]);
     double side3 = vertices[2].distanceTo(vertices[3]);
