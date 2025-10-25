@@ -14,17 +14,17 @@ public:
     Rhomb& operator=(const Rhomb& other);
     Rhomb& operator=(Rhomb&& other) noexcept;
 
-    virtual void print(std::ostream& os) const override;
-    virtual void read(std::istream& is) override;
+    void print(std::ostream& os) const override;
+    void read(std::istream& is) override;
 
-    virtual Point center() const override;
-    virtual double surface() const override;
+    Point center() const override;
+    double surface() const override;
 
-    virtual operator double() const override;
-    virtual bool operator==(const Figure& other) const override;
-    virtual bool operator!=(const Figure& other) const override;
+    operator double() const override;
+    bool operator==(const Figure& other) const override;
+    bool operator!=(const Figure& other) const override;
     
-    virtual bool validate() const override;
+    bool validate() const override;
 
     ~Rhomb();
 
